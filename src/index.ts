@@ -2,8 +2,11 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import AuthRoutes from './routes/AuthRoutes';
+import errorHandler from './middlewares/ErrorHandler';
 
 // Load environment variables
 dotenv.config();
@@ -26,8 +29,15 @@ mongoose.connect(env.MONGO_URI as string)
     });
 
 // Configure Express with middlewares
-app.use(cors());
+const corsOptions = {
+    origin: env.CLIENT_URL,
+    credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use('/api/auth', AuthRoutes);
 
 // Routes & Controllers
 app.get('/', (req: express.Request, res: express.Response) => {
@@ -35,10 +45,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
 });
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(err.message);
-    res.status(500).send('Something broke!');
-});
+app.use(errorHandler);
 
 
 
