@@ -60,12 +60,13 @@ export async function Register(
     res: Response,
     next: NextFunction
 ){
-    const { name, email, password, role, adminSecret } = req.body;
+    const { name, email, password, role, secret } = req.body;
     const hashedPassword = await hashPassword(password);
     if(password?.length < 6) {
         return next(new ErrorResponse("Password must be at least 6 characters", 400));
     }
-    if(role === "admin" && adminSecret as string !== process.env.ADMIN_SECRET as string) {
+    console.log(role, secret, process.env.ADMIN_SECRET);
+    if(role === "admin" && secret as string !== process.env.ADMIN_SECRET as string) {
         return next(new ErrorResponse("Invalid admin secret", 400));
     }
 

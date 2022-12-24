@@ -68,12 +68,13 @@ function Login(req, res, next) {
 exports.Login = Login;
 function Register(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { name, email, password, role, adminSecret } = req.body;
+        const { name, email, password, role, secret } = req.body;
         const hashedPassword = yield hashPassword(password);
         if ((password === null || password === void 0 ? void 0 : password.length) < 6) {
             return next(new ErrorResponse_1.default("Password must be at least 6 characters", 400));
         }
-        if (role === "admin" && adminSecret !== process.env.ADMIN_SECRET) {
+        console.log(role, secret, process.env.ADMIN_SECRET);
+        if (role === "admin" && secret !== process.env.ADMIN_SECRET) {
             return next(new ErrorResponse_1.default("Invalid admin secret", 400));
         }
         try {
